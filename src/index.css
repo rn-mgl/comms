@@ -1,13 +1,106 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  .cstm-flex {
+    @apply flex items-center justify-center;
+  }
+
+  .cstm-gbg-1-3 {
+    @apply bg-gradient-to-br from-gr1 to-gr3;
+  }
+
+  .cstm-gbg-1-2 {
+    @apply bg-gradient-to-br from-gr1 to-gr2;
+  }
+
+  .cstm-gbg-2-3 {
+    @apply bg-gradient-to-br from-gr2 to-gr3;
+  }
+
+  .cstm-gbg-n6-blk {
+    @apply bg-gradient-to-br from-neutral-600 to-blk;
+  }
+
+  .cstm-gbg-n1-n4 {
+    @apply bg-gradient-to-br from-neutral-100 to-neutral-400;
+  }
+
+  .cstm-gbg-red3-red6 {
+    @apply bg-gradient-to-br from-red-300 to-red-600;
+  }
+
+  .cstm-gbg-grn3-grn6 {
+    @apply bg-gradient-to-br from-green-300 to-green-600;
+  }
+
+  .cstm-l-border {
+    @apply border-[1px] border-neutral-400 rounded-md;
+  }
+
+  .cstm-center-abs {
+    @apply absolute top-2/4 left-2/4 -translate-x-2/4 -translate-y-2/4;
+  }
+
+  .cstm-nav-text {
+    @apply font-head text-sm hover:bg-gr1 hover:text-blk rounded transition-all duration-100 p-2 bg-gr3 text-wht;
+  }
+
+  .cstm-active-nav {
+    @apply font-head text-sm cstm-gbg-1-3 hover:bg-gr1 hover:text-blk rounded transition-all duration-100 p-2 text-wht;
+  }
+
+  .cstm-chat-bar {
+    @apply bg-gr1 w-max py-2 px-4 rounded-md font-body text-sm;
+  }
+
+  .cstm-sender-bar {
+    @apply bg-gr3 text-wht;
+  }
+
+  .cstm-sending-bar {
+    @apply cstm-gbg-1-2 text-blk;
+  }
+
+  .cstm-receiver-bar {
+    @apply bg-wht text-blk;
+  }
+
+  .cstm-divider {
+    @apply w-full bg-slate-300 my-4 opacity-50 h-[1px] rounded-full;
+  }
+
+  .cstm-loader {
+    @apply w-20 h-1 rounded-full bg-blk absolute translate-y-8 -translate-x-40 animate-loading;
+  }
+
+  .cstm-nav-hover-text {
+    @apply hidden group-hover:flex absolute w-max translate-y-10 bg-gr3 shadow-md p-2 rounded-md text-wht font-medium;
+  }
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+@layer components {
+  .cstm-btn {
+    @apply rounded-md w-full font-bold px-4 py-2 font-head transition-all duration-75 hover:shadow-md t:text-base l-l:text-lg hover:cursor-pointer;
+  }
+
+  .cstm-input {
+    @apply cstm-l-border w-full rounded-md p-3 px-4 focus:outline-wht l-l:text-lg font-body text-sm;
+  }
+
+  .cstm-room-bar {
+    @apply w-full bg-blk text-wht p-3 rounded-md cstm-flex justify-start cursor-pointer hover:bg-gr2 transition-all;
+  }
+
+  .cstm-scrollbar {
+    @apply scroll-smooth scrollbar-thin scrollbar-track-gr1 scrollbar-thumb-gr3 scrollbar-thumb-rounded-full scrollbar-track-rounded-full;
+  }
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
