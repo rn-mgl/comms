@@ -1,6 +1,8 @@
 import React from "react";
+
 import logoB from "../../IMG/comms logo.png";
 import logoW from "../../IMG/comms logo white.png";
+
 import { Link } from "react-router-dom";
 
 export default function LogoImg() {

@@ -6,10 +6,12 @@ import LinkButton from "../../COMPONENTS/INPUT/LinkButton";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { useGlobalContext } from "../../context";
+import ErrMsg from "../../COMPONENTS/GLOBALS/ErrMsg";
 
 export default function Verify() {
   const { token } = useParams();
   const { url } = useGlobalContext();
+  const [err, setErr] = React.useState({ msg: "", active: false });
 
   const verifyUser = React.useCallback(async () => {
     try {
@@ -17,6 +19,7 @@ export default function Verify() {
       console.log(data);
     } catch (error) {
       console.log(error);
+      setErr({ msg: error, active: true });
     }
   }, [token, url]);
 
@@ -26,6 +29,7 @@ export default function Verify() {
 
   return (
     <div className="cstm-flex flex-col gap-3 text-center h-screen cstm-gbg-1-2 p-5">
+      <ErrMsg err={err} setErr={setErr} />
       <LogoImg />
       <div>
         <div

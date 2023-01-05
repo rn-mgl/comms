@@ -1,7 +1,9 @@
 import React from "react";
+
 import { AiOutlineCloseCircle } from "react-icons/ai";
 import { NavLink, useParams } from "react-router-dom";
 import { useGlobalContext } from "../../context";
+
 import axios from "axios";
 import ErrMsg from "../GLOBALS/ErrMsg";
 
@@ -23,7 +25,7 @@ export default function Header(props) {
       }
     } catch (error) {
       console.log(error);
-      setErr({ msg: error.response.data.msg, active: true });
+      setErr({ msg: error, active: true });
     }
   };
   const clearLocalStorageRoom = () => {
@@ -39,7 +41,7 @@ export default function Header(props) {
         <div
           className={
             !props.roomData?.room_image &&
-            "cstm-gbg-1-3 cstm-flex text-blk font-light font-head text-lg capitalize w-12 h-12 rounded-full"
+            "cstm-gbg-1-3 bg-cover cstm-flex text-blk font-light font-head text-lg capitalize w-12 h-12 rounded-full"
           }
           style={{
             backgroundImage: props.roomData?.room_image && `url(${props.roomData?.room_image})`,

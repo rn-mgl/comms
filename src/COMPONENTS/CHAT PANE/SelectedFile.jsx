@@ -1,13 +1,15 @@
 import React from "react";
+
 import logo from "../../IMG/comms logo.png";
+
 import { AiOutlineCloseCircle } from "react-icons/ai";
 
 export default function SelectedFile(props) {
   const type = props.selectedFile.fileType;
   return (
     <div
-      className={`${
-        type === "audio" ? "w-full t:w-72" : "w-36"
+      className={`${type === "audio" ? "w-full t:w-72" : "w-36"} ${
+        props.css
       } shadow-md mr-auto rounded-md border-4 border-wht bg-wht text-center text-xs font-light font-head opacity-90`}
     >
       <AiOutlineCloseCircle

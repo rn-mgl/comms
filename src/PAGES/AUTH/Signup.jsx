@@ -48,7 +48,7 @@ export default function Signup() {
       return;
     }
     try {
-      const { data } = await axios.post(`${url}/auth/signup`, {
+      const { data } = await axios.post(`${url}/auth`, {
         name,
         surname,
         email,
@@ -63,7 +63,7 @@ export default function Signup() {
       }
     } catch (error) {
       console.log(error);
-      setErr({ msg: error.response.data.msg, active: true });
+      setErr({ msg: error, active: true });
     }
   };
 

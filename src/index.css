@@ -78,6 +78,10 @@
   .cstm-nav-hover-text {
     @apply hidden group-hover:flex absolute w-max translate-y-10 bg-gr3 shadow-md p-2 rounded-md text-wht font-medium;
   }
+
+  .cstm-chat-options {
+    @apply p-2 py-1 w-full rounded-md hover:bg-gr1 hover:text-blk cursor-pointer;
+  }
 }
 
 @layer components {

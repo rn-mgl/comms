@@ -7,6 +7,7 @@ import Signup from "./PAGES/AUTH/Signup";
 import Verify from "./PAGES/AUTH/Verify";
 import Standby from "./PAGES/AUTH/Standby";
 import AllRooms from "./PAGES/COMMS/AllRooms";
+import MyProfile from "./PAGES/COMMS/MyProfile";
 
 function App() {
   return (
@@ -79,6 +80,14 @@ function App() {
             element={
               <ValidityTest>
                 <AllRooms />
+              </ValidityTest>
+            }
+          />
+          <Route
+            path="mp"
+            element={
+              <ValidityTest>
+                <MyProfile />
               </ValidityTest>
             }
           />

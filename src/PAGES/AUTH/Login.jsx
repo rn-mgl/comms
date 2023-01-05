@@ -42,9 +42,11 @@ export default function Login() {
       return;
     }
     try {
-      const { data } = await axios.post(`${url}/auth/login`, {
-        candidate_email: email,
-        candidate_password: password,
+      const { data } = await axios.get(`${url}/auth`, {
+        params: {
+          candidate_email: email,
+          candidate_password: password,
+        },
       });
 
       if (data) {
@@ -56,8 +58,8 @@ export default function Login() {
         setErr({ msg: "The email and password does not match", active: true });
       }
     } catch (error) {
-      setErr({ msg: error.response.data.msg, active: true });
       console.log(error);
+      setErr({ msg: error, active: true });
     }
   };
 

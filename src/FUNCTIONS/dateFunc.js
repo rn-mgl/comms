@@ -31,7 +31,7 @@ export const dateAndTime = (date) => {
   const minute = splitTime[1];
   const state = splitMill[1];
 
-  const val = `${month}/${day}/${year} | ${hour} : ${minute} ${state}`;
+  const val = `${month}-${day}-${year} | ${hour}:${minute} ${state}`;
   return val;
 };
 

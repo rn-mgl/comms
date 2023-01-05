@@ -13,6 +13,7 @@ export default function IconInput(props) {
         id={props.id}
         defaultValue={props.value}
         onChange={props.onChange}
+        required={props.required}
         className="hidden"
       />
     </>

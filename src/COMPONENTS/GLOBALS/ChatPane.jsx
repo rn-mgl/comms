@@ -2,18 +2,19 @@ import React from "react";
 
 import ChatBar from "../CHAT PANE/ChatBar";
 import Header from "../CHAT PANE/Header";
-import TextArea from "../INPUT/TextArea";
+import ErrMsg from "./ErrMsg";
+import SendingMsg from "../CHAT PANE/SendingMsg";
 
-import { AiOutlineSend } from "react-icons/ai";
+import { AiOutlineCloseCircle } from "react-icons/ai";
+
 import { useParams } from "react-router-dom";
 import { useGlobalContext } from "../../context";
 import axios from "axios";
-import ErrMsg from "./ErrMsg";
-import SendingMsg from "../CHAT PANE/SendingMsg";
-import IconInput from "../INPUT/IconInput";
 
 import * as textFns from "../../FUNCTIONS/textFunc";
+import * as fileFns from "../../FUNCTIONS/fileFunc";
 import SelectedFile from "../CHAT PANE/SelectedFile";
+import MessageInput from "../CHAT PANE/MessageInput";
 
 export default function ChatPane({ fetchAllRooms, ...props }) {
   const { url, socket } = useGlobalContext();
@@ -22,7 +23,7 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
   const [messages, setMessages] = React.useState([]);
   const [sending, setSending] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
-  const [fetchLimit, setFetchLimit] = React.useState(10);
+  const [fetchLimit, setFetchLimit] = React.useState(20);
   const [selectedMessage, setSelectedMessage] = React.useState(-1);
   const [err, setErr] = React.useState({ msg: "", active: false });
   const [selectedFile, setSelectedFile] = React.useState({
@@ -31,10 +32,10 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
     fileName: "",
   });
   const [messageData, setMessageData] = React.useState({
-    receiver_id: -1,
     room_id: -1,
     message_content: "",
     message_file: undefined,
+    reply_to: { message_id: -1, message_content: "", message_file: undefined },
   });
   const paneRef = React.useRef();
   const bottomRef = React.useRef();
@@ -43,6 +44,9 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
   const token = localStorage.getItem("token");
   const messagePath = props.selectedRoom?.roomType === "direct" ? "dm" : "gm";
   const roomPath = props.selectedRoom?.roomType === "direct" ? "dr" : "gr";
+  const willReply =
+    messageData.reply_to.message_id &&
+    (messageData.reply_to.message_content || messageData.reply_to.message_file);
 
   const fetchMessages = React.useCallback(async () => {
     setLoading(true);
@@ -57,7 +61,7 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
       }
     } catch (error) {
       console.log(error);
-      setErr({ msg: error.response.data.msg, active: true });
+      setErr({ msg: error, active: true });
     }
     setLoading(false);
   }, [room_code, token, url, messagePath, fetchLimit]);
@@ -72,7 +76,7 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
         setMessageData((prev) => {
           return {
             ...prev,
-            receiver_id: data.receiver_id,
+            reply_to: { message_id: -1, message_content: "", message_file: undefined },
             room_id: data.room_id,
           };
         });
@@ -80,53 +84,42 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
       }
     } catch (error) {
       console.log(error);
-      setErr({ msg: error.response.data.msg, active: true });
+      setErr({ msg: error, active: true });
     }
   }, [room_code, token, url, roomPath, fetchAllRooms]);
-
-  const uploadFile = async (e) => {
-    e.preventDefault();
-    const fileData = e.target.message_file.files[0];
-    if (fileData.size > 10000000) {
-      setErr({ msg: "File size is too large. Use less than 10MB.", active: true });
-      setSending(false);
-      return "Size error";
-    }
-    const formData = new FormData();
-    formData.append("file", fileData);
-    let fileLink = undefined;
-    try {
-      const { data } = await axios.post(`${url}/uf`, formData, {
-        headers: { Authorization: token, "Content-Type": "multipart/form-data" },
-      });
-      fileLink = data.file_link;
-      return fileLink;
-    } catch (error) {
-      console.log(error);
-      setErr({ msg: error.response.data.msg, active: true });
-      setSending(false);
-    }
-  };
 
   const sendMessage = async (e) => {
     e.preventDefault();
     let fileLink = undefined;
-    const { receiver_id, room_id, message_content, message_file } = messageData;
-    if (textFns.isBlank(message_content) && !message_file) {
+    const { room_id, message_content, message_file, reply_to } = messageData;
+    if (textFns.isEmpty(message_content) && !message_file) {
       setErr({ msg: "Enter a message first before sending.", active: true });
       return;
     }
     setSending(true);
     if (message_file) {
-      fileLink = await uploadFile(e);
+      fileLink = await fileFns.uploadFile(
+        e.target.message_file.files[0],
+        url,
+        setSelectedFile,
+        setErr
+      );
     }
-    if (fileLink === "Size error") {
+    if (fileLink.startsWith("Error")) {
+      setErr({ msg: fileLink, active: true });
+      setSending(false);
       return;
     }
+
     try {
       const { data } = await axios.post(
         `${url}/${messagePath}/room/${room_code}`,
-        { receiver_id, room_id, message_content, message_file: fileLink ? fileLink : null },
+        {
+          room_id,
+          message_content: message_content === "" ? null : message_content,
+          reply_to: reply_to.message_id === -1 ? null : reply_to.message_id,
+          message_file: fileLink ? fileLink : null,
+        },
         { headers: { Authorization: token } }
       );
       if (data) {
@@ -136,25 +129,21 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
             message_content: "",
           };
         });
+        setSelectedFile({
+          fileUrl: undefined,
+          fileType: undefined,
+          fileName: "",
+        });
+        handleReplyTo(-1, "");
         socketSendMessage();
         fetchMessages();
+        fetchAllRooms();
       }
     } catch (error) {
       console.log(error);
-      setErr({ msg: error.response.data.msg, active: true });
+      setErr({ msg: error, active: true });
       setSending(false);
     }
-  };
-
-  const filePreview = (e) => {
-    if (!e.target.files || e.target.files.length === 0) {
-      setSelectedFile({ fileUrl: undefined, fileType: undefined, fileName: "" });
-      return;
-    }
-    const url = URL.createObjectURL(e.target.files[0]);
-    const type = e.target.files[0].type.split("/")[0];
-    const name = e.target.files[0].name;
-    setSelectedFile({ fileUrl: url, fileType: type, fileName: name });
   };
 
   const socketJoinRoom = React.useCallback(() => {
@@ -193,12 +182,12 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
     scrollIntoView();
   };
 
-  const selectMessage = (id) => {
-    setSelectedMessage((prev) => (prev === id ? -1 : id));
-  };
-
   const scrollIntoView = () => {
     bottomRef?.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const selectMessage = (id) => {
+    setSelectedMessage((prev) => (prev === id ? -1 : id));
   };
 
   const handleMessageData = ({ name, value }) => {
@@ -210,10 +199,20 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
     });
   };
 
+  const handleReplyTo = (id, content, file) => {
+    setMessageData((prev) => {
+      return {
+        ...prev,
+        reply_to: { message_id: id, message_content: content, message_file: file },
+      };
+    });
+  };
+
   const fetchOnScroll = () => {
     const el = paneRef.current;
     const pos = el.clientHeight + -el.scrollTop;
-    if (Math.ceil(pos) >= el.scrollHeight) {
+
+    if (Math.ceil(pos) >= el.scrollHeight - 10) {
       setFetchLimit((prev) => prev + 10);
       fetchMessages();
     }
@@ -270,43 +269,52 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
           ref={paneRef}
           onScroll={fetchOnScroll}
         >
+          {willReply && (
+            <>
+              <div
+                className="bg-blk text-wht w-10/12 text-center p-2 rounded-md font-body text-sm cstm-flex absolute z-10
+                          t:w-96"
+              >
+                <div className="text-left">
+                  <div className="font-light">reply to</div>
+                  <div className="font-semibold text-xs">
+                    {messageData.reply_to.message_content
+                      ? messageData.reply_to.message_content?.slice(0, 20)
+                      : messageData.reply_to.message_file?.split("/")[4]}
+                  </div>
+                </div>
+                <AiOutlineCloseCircle
+                  className="ml-auto cursor-pointer scale-110"
+                  onClick={() => handleReplyTo(-1, "")}
+                />
+              </div>
+              <div className="my-4" />
+            </>
+          )}
           <div ref={bottomRef} className="float-left clear-both" />
+
           {selectedFile.fileUrl && (
             <SelectedFile unselectFile={unselectFile} selectedFile={selectedFile} />
           )}
           {sending && <SendingMsg messageData={messageData} />}
           <ChatBar
+            messages={messages}
+            messagePath={messagePath}
+            fetchMessages={fetchMessages}
             selectMessage={selectMessage}
             selectedMessage={selectedMessage}
-            messages={messages}
+            handleReplyTo={handleReplyTo}
+            roomData={roomData}
           />
         </div>
 
-        <form className="w-full cstm-flex gap-3" onSubmit={(e) => sendMessage(e)}>
-          <IconInput
-            name="message_file"
-            id="message_file"
-            value={messageData.message_file}
-            onChange={(e) => {
-              handleMessageData(e.target);
-              filePreview(e);
-            }}
-          />
-
-          <TextArea
-            css="rounded-full"
-            name="message_content"
-            type="text"
-            value={messageData.message_content}
-            placeholder="enter message"
-            id="message_content"
-            onChange={(e) => handleMessageData(e.target)}
-            required={false}
-          />
-          <button type="submit">
-            <AiOutlineSend className="scale-[1.7] text-gr2" />
-          </button>
-        </form>
+        <MessageInput
+          sendMessage={sendMessage}
+          messageData={messageData}
+          handleMessageData={handleMessageData}
+          isBlocked={roomData?.is_blocked}
+          setSelectedFile={setSelectedFile}
+        />
       </div>
     )
   );

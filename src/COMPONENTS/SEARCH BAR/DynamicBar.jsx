@@ -1,5 +1,7 @@
 import React from "react";
+
 import Input from "../INPUT/Input";
+
 import { AiOutlineClose } from "react-icons/ai";
 import { NavLink } from "react-router-dom";
 
@@ -39,7 +41,7 @@ export default function DynamicBar(props) {
                   });
                   props.activeSearchBar();
                 }}
-                className="font-head text-sm p-2 w-full bg-gr4  rounded-md text-wht"
+                className="font-head text-sm p-2 w-full bg-blk  rounded-md text-wht"
               >
                 {room.roomName}
               </NavLink>

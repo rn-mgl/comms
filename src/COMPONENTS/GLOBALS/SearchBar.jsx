@@ -41,7 +41,9 @@ export default function SearchBar(props) {
           word={word}
           handleSearchWord={handleSearchWord}
           activeSearchBar={activeSearchBar}
+          selectRoom={props.selectRoom}
           rooms={rooms}
+          path={props.path}
         />
       ) : (
         <StaticBar activeSearchBar={activeSearchBar} />

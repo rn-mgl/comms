@@ -1,10 +1,14 @@
 import React from "react";
+
 import { Outlet, NavLink } from "react-router-dom";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
+import { useGlobalContext } from "../../context";
+
 import logo from "../../IMG/comms logo white.png";
 import SideNav from "./SideNav";
 import axios from "axios";
-import { useGlobalContext } from "../../context";
+
+import SingleNav from "../NAV/SingleNav";
 
 export default function Nav() {
   const { url, socket } = useGlobalContext();
@@ -23,7 +27,7 @@ export default function Nav() {
   const logOut = async () => {
     try {
       const { data } = await axios.patch(
-        `${url}/user/logout`,
+        `${url}/user/mnl/logout`,
         { is_active: 0 },
         { headers: { Authorization: token } }
       );
@@ -44,7 +48,7 @@ export default function Nav() {
 
   return (
     <>
-      <div className="p-8 bg-blk cstm-flex w-screen">
+      <div className="p-8 bg-blk cstm-flex w-full">
         <div className="cstm-flex absolute left-0">
           <MenuIcon
             color="white"
@@ -60,62 +64,57 @@ export default function Nav() {
           }         cstm-flex bg-blk absolute gap-10 flex-col cstm-center-abs h-screen w-screen z-10
                     t:flex t:flex-row t:h-auto t:top-8 t:bg-none t:w-min`}
         >
-          <NavLink
-            className={({ isActive }) => {
-              return isActive ? "cstm-active-nav" : "cstm-nav-text";
-            }}
-            to="/comms/ar"
-          >
-            <div className={`hidden t:cstm-flex group`}>
-              AR
-              <div className="cstm-nav-hover-text">All Rooms</div>
-            </div>
-            <div className={`t:hidden w-40 cstm-flex h-7 font-medium`}>All Rooms</div>
-          </NavLink>
-          <NavLink
-            className={({ isActive }) => {
-              return isActive ? "cstm-active-nav" : "cstm-nav-text";
-            }}
-            to="/comms/dr"
-          >
-            <div className={`hidden t:cstm-flex group`}>
-              DR<div className="cstm-nav-hover-text">Direct Rooms</div>
-            </div>
-            <div className={`t:hidden w-40 cstm-flex h-7 font-medium`}>Direct Rooms</div>
-          </NavLink>
-          <NavLink
-            className={({ isActive }) => {
-              return isActive ? "cstm-active-nav" : "cstm-nav-text";
-            }}
-            to="/comms/gr"
-          >
-            <div className={`hidden t:cstm-flex group`}>
-              GR<div className="cstm-nav-hover-text">Group Rooms</div>
-            </div>
-            <div className={`t:hidden w-40 cstm-flex h-7 font-medium`}>Group Rooms</div>
-          </NavLink>
-          <NavLink
-            className={({ isActive }) => {
-              return isActive ? "cstm-active-nav" : "cstm-nav-text";
-            }}
-            to="/comms/mp"
-          >
-            <div className={`hidden t:cstm-flex group`}>
-              MP<div className="cstm-nav-hover-text">My Profile</div>
-            </div>
-            <div className={`t:hidden w-40 cstm-flex h-7 font-medium`}>My Profile</div>
-          </NavLink>
+          <SingleNav
+            showNav={showNav}
+            handleShowNav={handleShowNav}
+            path="ar"
+            label="AR"
+            subLabel="All Roooms"
+          />
+
+          <SingleNav
+            showNav={showNav}
+            handleShowNav={handleShowNav}
+            path="dr"
+            label="DR"
+            subLabel="Direct Roooms"
+          />
+
+          <SingleNav
+            showNav={showNav}
+            handleShowNav={handleShowNav}
+            path="gr"
+            label="GR"
+            subLabel="Group Roooms"
+          />
+
+          <SingleNav
+            showNav={showNav}
+            handleShowNav={handleShowNav}
+            path="mp"
+            label="MP"
+            subLabel="My Profile"
+          />
+
           <NavLink
             className={({ isActive }) => {
               return isActive ? "cstm-active-nav t:hidden" : "cstm-nav-text t:hidden";
             }}
-            onClick={logOut}
+            onClick={() => {
+              handleShowNav();
+              logOut();
+            }}
             to="/"
           >
             <div className={`w-40 cstm-flex h-7 font-medium`}>Log Out</div>
           </NavLink>
         </div>
-        <NavLink className="right-5 absolute w-20 z-20" to="/comms/ar">
+
+        <NavLink
+          onClick={showNav && handleShowNav}
+          className="right-5 absolute w-20 z-20"
+          to="/comms/ar"
+        >
           <img alt="logo" src={logo} />
         </NavLink>
       </div>

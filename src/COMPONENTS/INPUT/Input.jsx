@@ -5,7 +5,7 @@ export default function Input(props) {
     <input
       name={props.name}
       type={props.type}
-      value={props.value}
+      defaultValue={props.value}
       placeholder={props.placeholder}
       id={props.id}
       onChange={props.onChange}
