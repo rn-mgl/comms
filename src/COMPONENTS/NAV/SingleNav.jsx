@@ -7,7 +7,7 @@ export default function SingleNav(props) {
       className={({ isActive }) => {
         return isActive ? "cstm-active-nav" : "cstm-nav-text";
       }}
-      onClick={props.showNav && props.handleShowNav}
+      onClick={props.onClick}
       to={`/comms/${props.path}`}
     >
       <div className={`hidden t:cstm-flex group`}>

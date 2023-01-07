@@ -3,9 +3,7 @@ import React from "react";
 import axios from "axios";
 import { useGlobalContext } from "../../context";
 
-import { IoPersonAddOutline } from "react-icons/io5";
-import { ImMakeGroup } from "react-icons/im";
-import { FaConnectdevelop } from "react-icons/fa";
+import notificationSound from "../../AUDIO/chord.wav";
 
 import Rooms from "../../COMPONENTS/GLOBALS/Rooms";
 import SearchBar from "../../COMPONENTS/GLOBALS/SearchBar";
@@ -15,13 +13,14 @@ import Standby from "../../COMPONENTS/CHAT PANE/Standby";
 import AddFriend from "./AddFriend";
 import MakeGroup from "./MakeGroup";
 import JoinGroup from "./JoinGroup";
+import AllRoomsActions from "../../COMPONENTS/GLOBALS/AllRoomsActions";
 
 export default function AllRooms() {
   const { url, socket } = useGlobalContext();
   const [allRooms, setAllRooms] = React.useState([]);
   const [currPath, setCurrPath] = React.useState("ar");
   const [err, setErr] = React.useState({ msg: "", active: false });
-  const [activeBarOptions, setActiveBarOptions] = React.useState(-1);
+  const [activeBarOptions, setActiveBarOptions] = React.useState("");
   const [canAddFriend, setCanAddFriend] = React.useState(false);
   const [canMakeGroup, setCanMakeGroup] = React.useState(false);
   const [canJoinGroup, setCanJoinGroup] = React.useState(false);
@@ -31,6 +30,7 @@ export default function AllRooms() {
     roomFrom: undefined,
   });
 
+  const notification = React.useMemo(() => new Audio(notificationSound), []);
   const token = localStorage.getItem("token");
   const path = window.location.pathname.split("/");
 
@@ -73,12 +73,14 @@ export default function AllRooms() {
 
   const socketReceiveMessage = React.useCallback(() => {
     socket.on("receive-message", () => {
+      notification.play();
       fetchAllRooms();
+      document.title = "New Message | comms";
     });
-  }, [socket, fetchAllRooms]);
+  }, [socket, fetchAllRooms, notification]);
 
   const handleActiveBarOptions = (id) => {
-    setActiveBarOptions((prev) => (prev === id ? -1 : id));
+    setActiveBarOptions((prev) => (prev === id ? "" : id));
   };
 
   const handleCanAddFriend = () => {
@@ -144,36 +146,26 @@ export default function AllRooms() {
       >
         <SearchBar allRooms={allRooms} selectRoom={selectRoom} path={currPath} />
 
-        <div className="w-full cstm-flex gap-16 ">
-          <div className="cstm-nav-text p-3 cursor-pointer group">
-            <IoPersonAddOutline onClick={handleCanAddFriend} className="scale-[1.75]" />
-            <div className="cstm-nav-hover-text translate-y-5 bg-gr1 text-blk -translate-x-11">
-              Add Friend
-            </div>
-          </div>
-          <div className="cstm-nav-text p-3 cursor-pointer group">
-            <ImMakeGroup onClick={handleCanMakeGroup} className="scale-[1.75]" />
-            <div className="cstm-nav-hover-text translate-y-5 bg-gr1 text-blk -translate-x-11">
-              Make Group
-            </div>
-          </div>
-          <div className="cstm-nav-text p-3 cursor-pointer group">
-            <FaConnectdevelop onClick={handleCanJoinGroup} className="scale-[1.75]" />
-            <div className="cstm-nav-hover-text translate-y-5 bg-gr1 text-blk -translate-x-11">
-              Join Group
-            </div>
-          </div>
-        </div>
-
-        <Rooms
-          rooms={allRooms}
-          path={currPath}
-          selectRoom={selectRoom}
-          selectedRoom={selectedRoom}
-          activeBarOptions={activeBarOptions}
-          handleActiveBarOptions={handleActiveBarOptions}
-          fetchAllRooms={fetchAllRooms}
+        <AllRoomsActions
+          handleCanAddFriend={handleCanAddFriend}
+          handleCanMakeGroup={handleCanMakeGroup}
+          handleCanJoinGroup={handleCanJoinGroup}
         />
+
+        {allRooms.map((room) => {
+          return (
+            <Rooms
+              key={room.room_id}
+              room={room}
+              path={currPath}
+              selectRoom={selectRoom}
+              selectedRoom={selectedRoom}
+              activeBarOptions={activeBarOptions}
+              handleActiveBarOptions={handleActiveBarOptions}
+              fetchAllRooms={fetchAllRooms}
+            />
+          );
+        })}
       </div>
 
       {selectedRoom.roomId !== -1 && path[3] ? (
@@ -182,6 +174,7 @@ export default function AllRooms() {
           selectRoom={selectRoom}
           path={currPath}
           fetchAllRooms={fetchAllRooms}
+          notification={notification}
         />
       ) : (
         <Standby />

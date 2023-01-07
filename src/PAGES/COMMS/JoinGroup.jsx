@@ -8,12 +8,22 @@ import { AiOutlineArrowLeft } from "react-icons/ai";
 export default function JoinGroup(props) {
   const [groupType, setGroupType] = React.useState("public");
 
+  const handleEscape = (e) => {
+    if (e.keyCode === 27) {
+      props.handleCanJoinGroup();
+    }
+  };
+
   const handleGroupType = ({ value }) => {
     setGroupType(value);
   };
 
   return (
-    <div className="absolute left-0 top-0 w-full h-full backdrop-blur-sm z-20 cstm-flex">
+    <div
+      onKeyDown={(e) => handleEscape(e)}
+      tabIndex="0"
+      className="absolute left-0 top-0 w-full h-full backdrop-blur-sm z-20 cstm-flex"
+    >
       <div
         className="w-11/12 h-4/6 bg-gr1 p-3 rounded-md shadow-md overflow-y-scroll cstm-scrollbar cstm-flex flex-col justify-start gap-3
                   t:w-6/12

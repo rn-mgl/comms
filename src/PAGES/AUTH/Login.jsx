@@ -52,6 +52,7 @@ export default function Login() {
       if (data) {
         localStorage.setItem("token", `Bearer ${data.token}`);
         localStorage.setItem("user", data.user.id);
+        localStorage.setItem("name", data.user.name);
         socketLogin();
         navigate("/comms/ar");
       } else {

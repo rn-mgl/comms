@@ -33,10 +33,17 @@ export default function MakeGroup(props) {
       );
       if (data) {
         props.fetchAllRooms();
+        props.handleCanMakeGroup();
       }
     } catch (error) {
       console.log(error);
       setErr({ msg: error, active: true });
+    }
+  };
+
+  const handleEscape = (e) => {
+    if (e.keyCode === 27) {
+      props.handleCanMakeGroup();
     }
   };
 
@@ -50,7 +57,11 @@ export default function MakeGroup(props) {
   };
 
   return (
-    <div className="absolute backdrop-blur-sm w-full h-full z-20 left-0 top-0 cstm-flex">
+    <div
+      onKeyDown={(e) => handleEscape(e)}
+      tabIndex="0"
+      className="absolute backdrop-blur-sm w-full h-full z-20 left-0 top-0 cstm-flex"
+    >
       <ErrMsg err={err} setErr={setErr} />
       <div
         className="h-min bg-gr1 p-2 rounded-md w-11/12 shadow-md cstm-flex flex-col gap-5

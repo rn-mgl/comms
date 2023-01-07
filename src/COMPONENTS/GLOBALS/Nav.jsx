@@ -27,7 +27,7 @@ export default function Nav() {
   const logOut = async () => {
     try {
       const { data } = await axios.patch(
-        `${url}/user/mnl/logout`,
+        `${url}/user/mnl/user`,
         { is_active: 0 },
         { headers: { Authorization: token } }
       );
@@ -65,32 +65,29 @@ export default function Nav() {
                     t:flex t:flex-row t:h-auto t:top-8 t:bg-none t:w-min`}
         >
           <SingleNav
-            showNav={showNav}
-            handleShowNav={handleShowNav}
+            onClick={showNav && handleShowNav}
             path="ar"
             label="AR"
             subLabel="All Roooms"
           />
 
           <SingleNav
-            showNav={showNav}
-            handleShowNav={handleShowNav}
+            onClick={showNav && handleShowNav}
             path="dr"
             label="DR"
             subLabel="Direct Roooms"
           />
 
           <SingleNav
-            showNav={showNav}
-            handleShowNav={handleShowNav}
+            onClick={showNav && handleShowNav}
             path="gr"
             label="GR"
             subLabel="Group Roooms"
           />
 
           <SingleNav
-            showNav={showNav}
-            handleShowNav={handleShowNav}
+            onClick={showNav && handleShowNav}
+            ge
             path="mp"
             label="MP"
             subLabel="My Profile"

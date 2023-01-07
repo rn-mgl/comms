@@ -137,12 +137,20 @@ export default function UpdateUserData(props) {
     });
   };
 
+  const handleEscape = (e) => {
+    if (e.keyCode === 27) {
+      props.handleCanUpdateUserData();
+    }
+  };
+
   React.useEffect(() => {
     fetchUserData();
   }, [fetchUserData]);
 
   return (
     <div
+      onKeyDown={(e) => handleEscape(e)}
+      tabIndex="0"
       className={`fixed w-full h-full top-0 left-0 backdrop-blur-sm cstm-flex z-20 overflow-y-auto cstm-scrollbar py-5 ${
         updateAll && "items-start"
       } `}

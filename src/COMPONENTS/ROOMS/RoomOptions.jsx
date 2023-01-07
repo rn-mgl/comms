@@ -8,6 +8,7 @@ export default function RoomOptions(props) {
   const muteRoomFunction = isDirect ? props.muteDirectRoom : props.muteGroupRoom;
   const blockRoomFunction = isDirect ? props.blockDirectRoom : props.blockGroupRoom;
   const user = parseInt(localStorage.getItem("user"));
+
   return (
     <div
       className="absolute z-10 bg-gr2 rounded-md w-64 text-center cstm-flex gap-1 text-wht p-2 font-body -translate-x-2 shadow-md

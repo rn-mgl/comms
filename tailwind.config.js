@@ -25,15 +25,6 @@ module.exports = {
         "l-s": "1024px",
         "l-l": "1440px",
       },
-      keyframes: {
-        loading: {
-          "0%": { transform: "translate(-50vw, 2rem)" },
-          "100%": { transform: "translate(50vw, 2rem)" },
-        },
-      },
-      animation: {
-        loading: "loading 1s ease-in-out alternate infinite",
-      },
     },
   },
   plugins: [require("tailwind-scrollbar")({ nocompatible: true })],

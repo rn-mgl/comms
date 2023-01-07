@@ -17,6 +17,16 @@ export default function AddFriend(props) {
 
   const token = localStorage.getItem("token");
 
+  const handleInput = ({ value }) => {
+    setWord(value);
+  };
+
+  const displayUsers = React.useCallback(() => {
+    setMatchingUsers(
+      allUsers.filter((user) => user.name?.includes(word) || user.email?.includes(word))
+    );
+  }, [allUsers, word]);
+
   const fetchAllUsers = React.useCallback(async () => {
     try {
       const { data } = await axios.get(`${url}/user`, { headers: { Authorization: token } });
@@ -45,15 +55,11 @@ export default function AddFriend(props) {
     }
   };
 
-  const handleInput = ({ value }) => {
-    setWord(value);
+  const handleEscape = (e) => {
+    if (e.keyCode === 27) {
+      props.handleCanAddFriend();
+    }
   };
-
-  const displayUsers = React.useCallback(() => {
-    setMatchingUsers(
-      allUsers.filter((user) => user.name?.includes(word) || user.email?.includes(word))
-    );
-  }, [allUsers, word]);
 
   React.useEffect(() => {
     fetchAllUsers();
@@ -64,7 +70,11 @@ export default function AddFriend(props) {
   }, [displayUsers]);
 
   return (
-    <div className="fixed backdrop-blur-sm w-full h-full z-20 cstm-flex left-0 top-0">
+    <div
+      onKeyDown={(e) => handleEscape(e)}
+      tabIndex="0"
+      className="fixed backdrop-blur-sm w-full h-full z-20 cstm-flex left-0 top-0"
+    >
       <ErrMsg err={err} setErr={setErr} />
       <div
         className="w-11/12 h-5/6 bg-gr1 rounded-md shadow-md cstm-l-border p-5 cstm-flex flex-col justify-start gap-3 overflow-y-auto cstm-scrollbar

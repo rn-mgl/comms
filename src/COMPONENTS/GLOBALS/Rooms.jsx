@@ -16,12 +16,17 @@ export default function Rooms(props) {
   const [err, setErr] = React.useState({ msg: "", active: false });
 
   const token = localStorage.getItem("token");
+  const optionsIsVisible = props.activeBarOptions === props.room?.room_id;
+  const roomName =
+    props.room?.room_name?.length > 15
+      ? `${props.room?.room_name.slice(0, 15)}...`
+      : props.room?.room_name;
 
-  const unfriendUser = async () => {
+  const unfriendUser = async (removed_friend) => {
     try {
       const { data } = await axios.delete(`${url}/dr`, {
         headers: { Authorization: token },
-        data: { room_code: roomSelected.roomCode },
+        data: { room_code: roomSelected.roomCode, removed_friend },
       });
       if (data) {
         props.fetchAllRooms();
@@ -53,7 +58,7 @@ export default function Rooms(props) {
   const muteDirectRoom = async () => {
     try {
       const { data } = await axios.patch(
-        `${url}/dr/mnl/rm`,
+        `${url}/dr/mt/rm`,
         { room_code: roomSelected.roomCode },
         { headers: { Authorization: token } }
       );
@@ -121,73 +126,71 @@ export default function Rooms(props) {
   return (
     <div className="cstm-flex flex-col w-full gap-2">
       <ErrMsg err={err} setErr={setErr} />
-      {props.rooms.map((room) => {
-        const optionsIsVisible = props.activeBarOptions === room.room_id;
-        const roomName =
-          room.room_name?.length > 15 ? `${room.room_name.slice(0, 15)}...` : room.room_name;
 
-        return (
-          <div className="w-full cstm-flex" key={room.room_id}>
-            <NavLink
-              className={({ isActive }) =>
-                `${isActive ? "bg-gr4 border-blk border-4" : "bg-gr3"} cstm-room-bar `
-              }
-              to={`/comms/${props.path}/${room.room_code}`}
-              onClick={() =>
-                props.selectRoom({
-                  roomId: room.room_id,
-                  roomType: room.room_type,
-                  roomFrom: props.path,
-                })
-              }
-            >
-              <div className="cstm-flex">
-                <div
-                  className={
-                    !room.room_image &&
-                    "cstm-gbg-n1-n4 bg-cover cstm-flex text-blk font-light font-head text-lg capitalize w-9 h-9 rounded-full"
-                  }
-                  style={{ backgroundImage: room.room_image && `url(${room.room_image})` }}
-                >
-                  {!room.room_image && room.room_name[0]}
-                </div>
-                <div
-                  className={`${
-                    !parseInt(room.is_active) ? "cstm-gbg-red3-red6" : "cstm-gbg-grn3-grn6"
-                  } w-4 h-4 rounded-full cstm-flex relative -translate-x-3 translate-y-3`}
-                />
-              </div>
-
-              <div className="cstm-flex flex-col items-start mr-auto">
-                <div className="font-head font-medium text-base">{roomName}</div>
-                {!room.is_seen && (
-                  <div className="font-body font-light text-xs italic">New Message...</div>
-                )}
-              </div>
-              {room.is_muted ? <IoNotificationsOffOutline /> : null}
-              {room.is_blocked ? <BiBlock /> : null}
-            </NavLink>
-            {optionsIsVisible && (
-              <RoomOptions
-                room={room}
-                unfriendUser={unfriendUser}
-                leaveRoom={leaveRoom}
-                muteGroupRoom={muteGroupRoom}
-                muteDirectRoom={muteDirectRoom}
-                blockGroupRoom={blockGroupRoom}
-                blockDirectRoom={blockDirectRoom}
-              />
-            )}
-            <AiOutlineMore
-              onClick={() => {
-                props.handleActiveBarOptions(room.room_id);
-                handleRoomSelected({ roomCode: room.room_code, roomId: room.room_id });
+      <div className="w-full cstm-flex">
+        <NavLink
+          className={({ isActive }) =>
+            `${isActive ? "bg-gr4 border-blk border-4" : "bg-gr3"} cstm-room-bar `
+          }
+          to={`/comms/${props.path}/${props.room?.room_code}`}
+          onClick={() =>
+            props.selectRoom({
+              roomId: props.room?.room_id,
+              roomType: props.room?.room_type,
+              roomFrom: props.path,
+            })
+          }
+        >
+          <div className="cstm-flex">
+            <div
+              className="cstm-gbg-n1-n4 bg-cover cstm-flex text-blk font-light font-head text-lg capitalize w-9 h-9 rounded-full"
+              style={{
+                backgroundImage: props.room?.room_image && `url(${props.room?.room_image})`,
               }}
-              className="relative cursor-pointer hover:bg-gr1 rounded-md"
+            >
+              {!props.room?.room_image && props.room?.room_name[0]}
+            </div>
+
+            <div
+              className={`${
+                !parseInt(props.room?.is_active) ? "cstm-gbg-red3-red6" : "cstm-gbg-grn3-grn6"
+              } w-4 h-4 rounded-full cstm-flex relative -translate-x-3 translate-y-3`}
             />
           </div>
-        );
-      })}
+
+          <div className="cstm-flex flex-col items-start mr-auto">
+            <div className="font-head font-medium text-base">{roomName}</div>
+
+            {!props.room?.is_seen && (
+              <div className="font-body font-light text-xs italic">New Message...</div>
+            )}
+          </div>
+
+          {props.room?.is_muted ? <IoNotificationsOffOutline /> : null}
+
+          {props.room?.is_blocked ? <BiBlock /> : null}
+        </NavLink>
+
+        {optionsIsVisible && (
+          <RoomOptions
+            room={props.room}
+            unfriendUser={() => unfriendUser(props.room?.member_id)}
+            leaveRoom={leaveRoom}
+            muteGroupRoom={muteGroupRoom}
+            muteDirectRoom={muteDirectRoom}
+            blockGroupRoom={blockGroupRoom}
+            blockDirectRoom={blockDirectRoom}
+          />
+        )}
+
+        <AiOutlineMore
+          onClick={() => {
+            props.handleActiveBarOptions(props.room?.room_id);
+            handleRoomSelected({ roomCode: props.room?.room_code, roomId: props.room?.room_id });
+          }}
+          className="relative cursor-pointer hover:bg-gr1 rounded-md"
+        />
+      </div>
     </div>
   );
 }

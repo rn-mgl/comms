@@ -37,7 +37,6 @@ export default function GroupRooms(props) {
         { headers: { Authorization: token } }
       );
       if (data) {
-        console.log(data);
         fetchGroupRooms();
       }
     } catch (error) {

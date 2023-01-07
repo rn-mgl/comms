@@ -30,11 +30,11 @@ export default function ReceivedRequests() {
     }
   }, [token, url, receivedPath]);
 
-  const acceptRequest = async (request_by, request_id) => {
+  const acceptRequest = async (request_by, request_id, room_code) => {
     try {
       const { data } = await axios.patch(
         `${url}/${receivedPath}`,
-        { request_id, request_by },
+        { request_id, request_by, room_code },
         { headers: { Authorization: token } }
       );
       if (data) {
@@ -94,7 +94,6 @@ export default function ReceivedRequests() {
         />
       </div>
       {requests.map((request) => {
-        console.log(request);
         return (
           <div
             key={request.request_id}
@@ -110,7 +109,9 @@ export default function ReceivedRequests() {
 
             <div className="cstm-flex w-full gap-5">
               <Button
-                onClick={() => acceptRequest(request.request_by, request.request_id)}
+                onClick={() =>
+                  acceptRequest(request.request_by, request.request_id, request.room_code)
+                }
                 css="text-xs bg-gr1 text-blk"
                 label="Accept"
               />

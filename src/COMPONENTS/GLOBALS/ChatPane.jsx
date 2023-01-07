@@ -5,7 +5,7 @@ import Header from "../CHAT PANE/Header";
 import ErrMsg from "./ErrMsg";
 import SendingMsg from "../CHAT PANE/SendingMsg";
 
-import { AiOutlineCloseCircle } from "react-icons/ai";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 import { useParams } from "react-router-dom";
 import { useGlobalContext } from "../../context";
@@ -15,6 +15,7 @@ import * as textFns from "../../FUNCTIONS/textFunc";
 import * as fileFns from "../../FUNCTIONS/fileFunc";
 import SelectedFile from "../CHAT PANE/SelectedFile";
 import MessageInput from "../CHAT PANE/MessageInput";
+import ReplyMode from "../CHAT PANE/ReplyMode";
 
 export default function ChatPane({ fetchAllRooms, ...props }) {
   const { url, socket } = useGlobalContext();
@@ -40,6 +41,7 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
   const paneRef = React.useRef();
   const bottomRef = React.useRef();
 
+  props.notification.volume = 1;
   const { room_code } = useParams();
   const token = localStorage.getItem("token");
   const messagePath = props.selectedRoom?.roomType === "direct" ? "dm" : "gm";
@@ -71,6 +73,7 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
       const { data } = await axios.get(`${url}/${roomPath}/${room_code}`, {
         headers: { Authorization: token },
       });
+
       if (data) {
         setRoomData(data);
         setMessageData((prev) => {
@@ -81,6 +84,7 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
           };
         });
         fetchAllRooms();
+        document.title = "comms by rltn";
       }
     } catch (error) {
       console.log(error);
@@ -90,13 +94,18 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
 
   const sendMessage = async (e) => {
     e.preventDefault();
+
     let fileLink = undefined;
+
     const { room_id, message_content, message_file, reply_to } = messageData;
+
     if (textFns.isEmpty(message_content) && !message_file) {
       setErr({ msg: "Enter a message first before sending.", active: true });
       return;
     }
+
     setSending(true);
+
     if (message_file) {
       fileLink = await fileFns.uploadFile(
         e.target.message_file.files[0],
@@ -105,7 +114,8 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
         setErr
       );
     }
-    if (fileLink.startsWith("Error")) {
+
+    if (fileLink?.startsWith("Error")) {
       setErr({ msg: fileLink, active: true });
       setSending(false);
       return;
@@ -122,26 +132,38 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
         },
         { headers: { Authorization: token } }
       );
+
       if (data) {
         setMessageData((prev) => {
           return {
             ...prev,
             message_content: "",
+            message_file: undefined,
+            reply_to: { message_id: -1, message_content: "", message_file: undefined },
           };
         });
+
         setSelectedFile({
           fileUrl: undefined,
           fileType: undefined,
           fileName: "",
         });
+
         handleReplyTo(-1, "");
+
         socketSendMessage();
+
         fetchMessages();
+
         fetchAllRooms();
+
+        document.title = "comms by rltn";
       }
     } catch (error) {
       console.log(error);
+
       setErr({ msg: error, active: true });
+
       setSending(false);
     }
   };
@@ -251,15 +273,19 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
                   l-l:w-9/12"
       >
         <ErrMsg err={err} setErr={setErr} />
-        <div className="relative overflow-hidden w-full cstm-flex flex-col">
+        <div className="relative w-full cstm-flex flex-col">
           <Header
             roomData={roomData}
             selectRoom={props.selectRoom}
             roomType={props.selectedRoom?.roomType}
             path={props.path}
             roomPath={roomPath}
+            fetchAllRooms={fetchAllRooms}
           />
-          {loading && <div className="cstm-loader" />}
+
+          {/* {loading && (
+            <AiOutlineLoading3Quarters className="absolute animate-spin text-blk left-11 bottom-3" />
+          )} */}
         </div>
 
         <div
@@ -269,27 +295,14 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
           ref={paneRef}
           onScroll={fetchOnScroll}
         >
+          {loading && (
+            <AiOutlineLoading3Quarters
+              className="absolute top-24 animate-spin text-gr1
+                      t:top-44"
+            />
+          )}
           {willReply && (
-            <>
-              <div
-                className="bg-blk text-wht w-10/12 text-center p-2 rounded-md font-body text-sm cstm-flex absolute z-10
-                          t:w-96"
-              >
-                <div className="text-left">
-                  <div className="font-light">reply to</div>
-                  <div className="font-semibold text-xs">
-                    {messageData.reply_to.message_content
-                      ? messageData.reply_to.message_content?.slice(0, 20)
-                      : messageData.reply_to.message_file?.split("/")[4]}
-                  </div>
-                </div>
-                <AiOutlineCloseCircle
-                  className="ml-auto cursor-pointer scale-110"
-                  onClick={() => handleReplyTo(-1, "")}
-                />
-              </div>
-              <div className="my-4" />
-            </>
+            <ReplyMode messageData={messageData} handleReplyTo={() => handleReplyTo(-1, "")} />
           )}
           <div ref={bottomRef} className="float-left clear-both" />
 

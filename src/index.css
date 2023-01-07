@@ -71,10 +71,6 @@
     @apply w-full bg-slate-300 my-4 opacity-50 h-[1px] rounded-full;
   }
 
-  .cstm-loader {
-    @apply w-20 h-1 rounded-full bg-blk absolute translate-y-8 -translate-x-40 animate-loading;
-  }
-
   .cstm-nav-hover-text {
     @apply hidden group-hover:flex absolute w-max translate-y-10 bg-gr3 shadow-md p-2 rounded-md text-wht font-medium;
   }

@@ -8,6 +8,7 @@ import Verify from "./PAGES/AUTH/Verify";
 import Standby from "./PAGES/AUTH/Standby";
 import AllRooms from "./PAGES/COMMS/AllRooms";
 import MyProfile from "./PAGES/COMMS/MyProfile";
+import React from "react";
 
 function App() {
   return (
