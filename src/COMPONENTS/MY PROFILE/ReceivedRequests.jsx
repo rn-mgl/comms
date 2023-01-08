@@ -12,7 +12,7 @@ export default function ReceivedRequests() {
   const [receivedPath, setReceivedPath] = React.useState("drreq");
   const [err, setErr] = React.useState({ msg: "", active: false });
 
-  const { url } = useGlobalContext();
+  const { url, socket } = useGlobalContext();
   const token = localStorage.getItem("token");
 
   const fetchReceivedRequests = React.useCallback(async () => {
@@ -39,6 +39,7 @@ export default function ReceivedRequests() {
       );
       if (data) {
         fetchReceivedRequests();
+        socketAcceptRequest();
       }
     } catch (error) {
       console.log(error);
@@ -54,6 +55,7 @@ export default function ReceivedRequests() {
       });
       if (data) {
         fetchReceivedRequests();
+        socketRejectRequest();
       }
     } catch (error) {
       console.log(error);
@@ -61,13 +63,41 @@ export default function ReceivedRequests() {
     }
   };
 
+  const socketAcceptRequest = () => {
+    socket.emit("accept-request", { msg: "accept" });
+  };
+
+  const socketRejectRequest = () => {
+    socket.emit("reject-request", { msg: "reject" });
+  };
+
   const handleReceivedPath = ({ value }) => {
     setReceivedPath(value === "group" ? "grreq" : value === "direct" ? "drreq" : null);
   };
 
+  const socketReflectReceiveRequest = React.useCallback(() => {
+    socket.on("reflect-send-request", () => {
+      fetchReceivedRequests();
+    });
+  }, [fetchReceivedRequests, socket]);
+
+  const socketReflectAccept = React.useCallback(() => {
+    socket.on("reflect-accept", () => {
+      fetchReceivedRequests();
+    });
+  }, [socket, fetchReceivedRequests]);
+
   React.useEffect(() => {
     fetchReceivedRequests();
   }, [fetchReceivedRequests]);
+
+  React.useEffect(() => {
+    socketReflectAccept();
+  }, [socketReflectAccept]);
+
+  React.useEffect(() => {
+    socketReflectReceiveRequest();
+  }, [socketReflectReceiveRequest]);
 
   return (
     <div className="cstm-flex justify-start flex-col gap-3 bg-gr1 p-2 w-full rounded-md overflow-y-auto cstm-scrollbar h-64 scrollbar-thumb-gr2">

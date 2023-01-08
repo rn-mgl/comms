@@ -10,7 +10,7 @@ export default function GroupRooms(props) {
   const [rooms, setRooms] = React.useState([]);
   const [err, setErr] = React.useState({ msg: "", active: false });
 
-  const { url } = useGlobalContext();
+  const { url, socket } = useGlobalContext();
   const token = localStorage.getItem("token");
   const isPublic = props.groupType === "public";
 
@@ -38,6 +38,7 @@ export default function GroupRooms(props) {
       );
       if (data) {
         fetchGroupRooms();
+        socketSendRequest();
       }
     } catch (error) {
       console.log(error);
@@ -57,11 +58,20 @@ export default function GroupRooms(props) {
       if (data) {
         fetchGroupRooms();
         props.fetchAllRooms();
+        socketJoinRoom();
       }
     } catch (error) {
       console.log(error);
       setErr({ msg: error, active: true });
     }
+  };
+
+  const socketSendRequest = () => {
+    socket.emit("send-request", { msg: "send" });
+  };
+
+  const socketJoinRoom = () => {
+    socket.emit("add-member", { msg: "add" });
   };
 
   React.useEffect(() => {

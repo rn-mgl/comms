@@ -9,7 +9,7 @@ import { useGlobalContext } from "../../context";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 
 export default function AddFriend(props) {
-  const { url } = useGlobalContext();
+  const { url, socket } = useGlobalContext();
   const [word, setWord] = React.useState("");
   const [allUsers, setAllUsers] = React.useState([]);
   const [matchingUsers, setMatchingUsers] = React.useState([]);
@@ -19,6 +19,10 @@ export default function AddFriend(props) {
 
   const handleInput = ({ value }) => {
     setWord(value);
+  };
+
+  const socketSendRequest = (id) => {
+    socket.emit("send-request", { msg: "send", room: id });
   };
 
   const displayUsers = React.useCallback(() => {
@@ -48,6 +52,7 @@ export default function AddFriend(props) {
       );
       if (data) {
         fetchAllUsers();
+        socketSendRequest();
       }
     } catch (error) {
       console.log(error);

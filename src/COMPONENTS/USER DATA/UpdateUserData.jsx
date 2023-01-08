@@ -103,7 +103,7 @@ export default function UpdateUserData(props) {
           name,
           surname,
           image: fileLink ? fileLink : image ? image : null,
-          in_comms_name,
+          in_comms_name: !in_comms_name ? null : in_comms_name,
           old_password,
           new_password,
           update_type: props.updateType,
@@ -204,7 +204,6 @@ export default function UpdateUserData(props) {
               name="in_comms_name"
               type="text"
               value={userData.in_comms_name}
-              required={true}
               placeholder="Enter In Comms Name"
               id="in_comms_name"
               onChange={(e) => handleUserData(e.target)}

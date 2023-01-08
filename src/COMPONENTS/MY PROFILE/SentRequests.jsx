@@ -12,7 +12,7 @@ export default function SentRequests() {
   const [sentPath, setSentPath] = React.useState("drreq");
   const [err, setErr] = React.useState({ msg: "", active: false });
 
-  const { url } = useGlobalContext();
+  const { url, socket } = useGlobalContext();
   const token = localStorage.getItem("token");
 
   const fetchSentRequests = React.useCallback(async () => {
@@ -48,9 +48,19 @@ export default function SentRequests() {
     setSentPath(value === "group" ? "grreq" : value === "direct" ? "drreq" : null);
   };
 
+  const socketReflectReject = React.useCallback(() => {
+    socket.on("reflect-reject", () => {
+      fetchSentRequests();
+    });
+  }, [socket, fetchSentRequests]);
+
   React.useEffect(() => {
     fetchSentRequests();
   }, [fetchSentRequests]);
+
+  React.useEffect(() => {
+    socketReflectReject();
+  }, [socketReflectReject]);
 
   return (
     <div className="cstm-flex justify-start flex-col gap-3 bg-gr3 p-2 w-full rounded-md overflow-y-auto cstm-scrollbar h-64 scrollbar-thumb-gr2">

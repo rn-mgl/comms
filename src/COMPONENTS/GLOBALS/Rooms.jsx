@@ -11,7 +11,7 @@ import axios from "axios";
 import ErrMsg from "./ErrMsg";
 
 export default function Rooms(props) {
-  const { url } = useGlobalContext();
+  const { url, socket } = useGlobalContext();
   const [roomSelected, setRoomSelected] = React.useState({ roomCode: "", roomId: -1 });
   const [err, setErr] = React.useState({ msg: "", active: false });
 
@@ -30,6 +30,7 @@ export default function Rooms(props) {
       });
       if (data) {
         props.fetchAllRooms();
+        socketUnfriendUser();
       }
     } catch (error) {
       console.log(error);
@@ -48,6 +49,7 @@ export default function Rooms(props) {
       );
       if (data) {
         props.fetchAllRooms();
+        socketLeaveRoom();
       }
     } catch (error) {
       console.log(error);
@@ -96,6 +98,7 @@ export default function Rooms(props) {
       );
       if (data) {
         props.fetchAllRooms();
+        socketBlockRoom();
       }
     } catch (error) {
       console.log(error);
@@ -103,20 +106,16 @@ export default function Rooms(props) {
     }
   };
 
-  const blockGroupRoom = async () => {
-    try {
-      const { data } = await axios.patch(
-        `${url}/gr/blck/rm`,
-        { room_code: roomSelected.roomCode },
-        { headers: { Authorization: token } }
-      );
-      if (data) {
-        props.fetchAllRooms();
-      }
-    } catch (error) {
-      console.log(error);
-      setErr({ msg: error, active: true });
-    }
+  const socketUnfriendUser = () => {
+    socket.emit("unfriend", { msg: "unfriend" });
+  };
+
+  const socketLeaveRoom = () => {
+    socket.emit("leave", { msg: "unfriend" });
+  };
+
+  const socketBlockRoom = () => {
+    socket.emit("block", { msg: "block" });
   };
 
   const handleRoomSelected = (room) => {
@@ -178,7 +177,6 @@ export default function Rooms(props) {
             leaveRoom={leaveRoom}
             muteGroupRoom={muteGroupRoom}
             muteDirectRoom={muteDirectRoom}
-            blockGroupRoom={blockGroupRoom}
             blockDirectRoom={blockDirectRoom}
           />
         )}

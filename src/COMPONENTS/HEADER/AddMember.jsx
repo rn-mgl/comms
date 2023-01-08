@@ -7,7 +7,7 @@ import Button from "../INPUT/Button";
 export default function AddMember(props) {
   const [friends, setFriends] = React.useState([]);
 
-  const { url } = useGlobalContext();
+  const { url, socket } = useGlobalContext();
   const token = localStorage.getItem("token");
 
   const fetchFriends = React.useCallback(async () => {
@@ -38,10 +38,15 @@ export default function AddMember(props) {
 
       if (data) {
         fetchFriends();
+        socketAddMember();
       }
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const socketAddMember = () => {
+    socket.emit("add-member", { msg: "add" });
   };
 
   const handleEscape = (e) => {
@@ -50,9 +55,29 @@ export default function AddMember(props) {
     }
   };
 
+  const socketReflectAccept = React.useCallback(() => {
+    socket.on("reflect-accept", () => {
+      fetchFriends();
+    });
+  }, [socket, fetchFriends]);
+
+  const socketReflectAdd = React.useCallback(() => {
+    socket.on("reflect-add-member", () => {
+      fetchFriends();
+    });
+  }, [socket, fetchFriends]);
+
   React.useEffect(() => {
     fetchFriends();
   }, [fetchFriends]);
+
+  React.useEffect(() => {
+    socketReflectAccept();
+  }, [socketReflectAccept]);
+
+  React.useEffect(() => {
+    socketReflectAdd();
+  }, [socketReflectAdd]);
 
   return (
     <div

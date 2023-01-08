@@ -76,6 +76,36 @@ export default function AllRooms() {
     });
   }, [socket, fetchAllRooms, notification]);
 
+  const socketReflectAccept = React.useCallback(() => {
+    socket.on("reflect-accept", () => {
+      fetchAllRooms();
+    });
+  }, [socket, fetchAllRooms]);
+
+  const socketReflectBlock = React.useCallback(() => {
+    socket.on("reflect-block", () => {
+      fetchAllRooms();
+    });
+  }, [socket, fetchAllRooms]);
+
+  const socketReflectUnfriend = React.useCallback(() => {
+    socket.on("reflect-unfriend", () => {
+      fetchAllRooms();
+    });
+  }, [socket, fetchAllRooms]);
+
+  const socketReflectDeleteRoom = React.useCallback(() => {
+    socket.on("reflect-delete-room", () => {
+      fetchAllRooms();
+    });
+  }, [fetchAllRooms, socket]);
+
+  const socketRelfectRemove = React.useCallback(() => {
+    socket.on("reflect-remove-member", () => {
+      fetchAllRooms();
+    });
+  }, [fetchAllRooms, socket]);
+
   const handleActiveBarOptions = (id) => {
     setActiveBarOptions((prev) => (prev === id ? "" : id));
   };
@@ -111,6 +141,26 @@ export default function AllRooms() {
   React.useEffect(() => {
     socketReceiveMessage();
   }, [socketReceiveMessage]);
+
+  React.useEffect(() => {
+    socketReflectAccept();
+  }, [socketReflectAccept]);
+
+  React.useEffect(() => {
+    socketReflectBlock();
+  }, [socketReflectBlock]);
+
+  React.useEffect(() => {
+    socketReflectUnfriend();
+  }, [socketReflectUnfriend]);
+
+  React.useEffect(() => {
+    socketReflectDeleteRoom();
+  }, [socketReflectDeleteRoom]);
+
+  React.useEffect(() => {
+    socketRelfectRemove();
+  }, [socketRelfectRemove]);
 
   React.useEffect(() => {
     if (localStorage.getItem("roomId")) {

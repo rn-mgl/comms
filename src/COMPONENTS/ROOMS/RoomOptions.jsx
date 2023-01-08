@@ -6,7 +6,7 @@ export default function RoomOptions(props) {
   const isBlocked = props.room.is_blocked;
   const leaveRoomFunction = isDirect ? props.unfriendUser : props.leaveRoom;
   const muteRoomFunction = isDirect ? props.muteDirectRoom : props.muteGroupRoom;
-  const blockRoomFunction = isDirect ? props.blockDirectRoom : props.blockGroupRoom;
+  const blockRoomFunction = isDirect ? props.blockDirectRoom : null;
   const user = parseInt(localStorage.getItem("user"));
 
   return (

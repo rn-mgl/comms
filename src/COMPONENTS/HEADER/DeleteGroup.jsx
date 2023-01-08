@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 export default function DeleteGroup(props) {
   const [confirmation, setConfirmation] = React.useState("");
 
-  const { url } = useGlobalContext();
+  const { url, socket } = useGlobalContext();
   const token = localStorage.getItem("token");
   const roomName = props.roomData?.room_name;
   const roomCode = props.roomData?.room_code;
@@ -32,11 +32,16 @@ export default function DeleteGroup(props) {
       if (data) {
         props.fetchAllRooms();
         props.handleCanDeleteGroup();
+        socketDeleteRoom();
         navigate("/comms/ar");
       }
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const socketDeleteRoom = () => {
+    socket.emit("delete-room", { msg: "delete" });
   };
 
   const handleEscape = (e) => {

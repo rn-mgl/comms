@@ -7,7 +7,7 @@ import Button from "../INPUT/Button";
 export default function SendJoinRequests(props) {
   const [users, setUsers] = React.useState([]);
 
-  const { url } = useGlobalContext();
+  const { url, socket } = useGlobalContext();
   const token = localStorage.getItem("token");
 
   const fetchAllUsers = React.useCallback(async () => {
@@ -36,10 +36,15 @@ export default function SendJoinRequests(props) {
       );
       if (data) {
         fetchAllUsers();
+        socketSendRequest();
       }
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const socketSendRequest = () => {
+    socket.emit("send-request", { msg: "send" });
   };
 
   const handleEscape = (e) => {

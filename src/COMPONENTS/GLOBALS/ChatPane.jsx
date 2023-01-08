@@ -7,7 +7,7 @@ import SendingMsg from "../CHAT PANE/SendingMsg";
 
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useGlobalContext } from "../../context";
 import axios from "axios";
 
@@ -44,6 +44,8 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
   props.notification.volume = 1;
   const { room_code } = useParams();
   const token = localStorage.getItem("token");
+  const user = parseInt(localStorage.getItem("user"));
+  const navigate = useNavigate();
   const messagePath = props.selectedRoom?.roomType === "direct" ? "dm" : "gm";
   const roomPath = props.selectedRoom?.roomType === "direct" ? "dr" : "gr";
   const willReply =
@@ -191,6 +193,17 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
     });
   }, [socket, fetchMessages]);
 
+  const socketReflectRemove = React.useCallback(() => {
+    socket.on("reflect-remove-member", (member_id) => {
+      if (member_id === user) {
+        navigate("/comms/ar");
+      }
+      fetchMessages();
+      fetchRoomData();
+      scrollIntoView();
+    });
+  }, [socket, fetchMessages, fetchRoomData, user, navigate]);
+
   const unselectFile = () => {
     setSelectedFile({
       fileUrl: undefined,
@@ -264,6 +277,10 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
     socketReceiveMessage();
   }, [socketReceiveMessage]);
 
+  React.useEffect(() => {
+    socketReflectRemove();
+  }, [socketReflectRemove]);
+
   return (
     props.selectedRoom?.roomId !== -1 && (
       <div
@@ -282,10 +299,6 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
             roomPath={roomPath}
             fetchAllRooms={fetchAllRooms}
           />
-
-          {/* {loading && (
-            <AiOutlineLoading3Quarters className="absolute animate-spin text-blk left-11 bottom-3" />
-          )} */}
         </div>
 
         <div
@@ -325,7 +338,7 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
           sendMessage={sendMessage}
           messageData={messageData}
           handleMessageData={handleMessageData}
-          isBlocked={roomData?.is_blocked}
+          roomData={roomData}
           setSelectedFile={setSelectedFile}
         />
       </div>

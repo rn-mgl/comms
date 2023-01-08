@@ -1,16 +1,18 @@
 import axios from "axios";
 import React from "react";
 import { AiOutlineArrowLeft } from "react-icons/ai";
+import { useNavigate } from "react-router-dom";
 import { useGlobalContext } from "../../context";
 import Button from "../INPUT/Button";
 
 export default function Members(props) {
   const [members, setMembers] = React.useState([]);
 
-  const { url } = useGlobalContext();
+  const { url, socket } = useGlobalContext();
   const token = localStorage.getItem("token");
   const user = parseInt(localStorage.getItem("user"));
   const isAdmin = props.roomData?.is_admin;
+  const navigate = useNavigate();
 
   const fetchAllMembers = React.useCallback(async () => {
     try {
@@ -34,10 +36,15 @@ export default function Members(props) {
       );
       if (data) {
         fetchAllMembers();
+        socketRemoveMember(member_id);
       }
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const socketRemoveMember = (member_id) => {
+    socket.emit("remove-member", member_id);
   };
 
   const handleEscape = (e) => {
@@ -46,9 +53,52 @@ export default function Members(props) {
     }
   };
 
+  const socketReflectAccept = React.useCallback(() => {
+    socket.on("reflect-accept", () => {
+      fetchAllMembers();
+    });
+  }, [socket, fetchAllMembers]);
+
+  const socketReflectAdd = React.useCallback(() => {
+    socket.on("reflect-add-member", () => {
+      fetchAllMembers();
+    });
+  }, [socket, fetchAllMembers]);
+
+  const socketReflectLeave = React.useCallback(() => {
+    socket.on("reflect-leave", () => {
+      fetchAllMembers();
+    });
+  }, [socket, fetchAllMembers]);
+
+  const socketReflectRemove = React.useCallback(() => {
+    socket.on("reflect-remove-member", (member_id) => {
+      if (member_id === user) {
+        navigate("/comms/ar");
+      }
+      fetchAllMembers();
+    });
+  }, [socket, fetchAllMembers, navigate, user]);
+
   React.useEffect(() => {
     fetchAllMembers();
   }, [fetchAllMembers]);
+
+  React.useEffect(() => {
+    socketReflectAccept();
+  }, [socketReflectAccept]);
+
+  React.useEffect(() => {
+    socketReflectAdd();
+  }, [socketReflectAdd]);
+
+  React.useEffect(() => {
+    socketReflectLeave();
+  }, [socketReflectLeave]);
+
+  React.useEffect(() => {
+    socketReflectRemove();
+  }, [socketReflectRemove]);
 
   return (
     <div

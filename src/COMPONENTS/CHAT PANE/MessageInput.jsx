@@ -9,7 +9,7 @@ import { AiOutlineSend } from "react-icons/ai";
 import * as fileFns from "../../FUNCTIONS/fileFunc";
 
 export default function MessageInput(props) {
-  return props.isBlocked ? (
+  return props.roomData?.isBlocked || !props.roomData?.is_member ? (
     <Unavailable />
   ) : (
     <form className="w-full cstm-flex gap-3" onSubmit={(e) => props.sendMessage(e)}>
