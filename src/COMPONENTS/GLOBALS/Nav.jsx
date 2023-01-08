@@ -24,6 +24,14 @@ export default function Nav() {
     socket.emit("logout", { msg: "logged out" });
   };
 
+  const clearStorage = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("roomId");
+    localStorage.removeItem("roomType");
+    localStorage.removeItem("roomFrom");
+  };
+
   const logOut = async () => {
     try {
       const { data } = await axios.patch(
@@ -32,12 +40,8 @@ export default function Nav() {
         { headers: { Authorization: token } }
       );
       if (data) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        localStorage.removeItem("roomId");
-        localStorage.removeItem("roomType");
-        localStorage.removeItem("roomFrom");
         socketLogout();
+        clearStorage();
       }
     } catch (error) {
       console.log(error);

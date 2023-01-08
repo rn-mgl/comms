@@ -3,8 +3,6 @@ import React from "react";
 import axios from "axios";
 import { useGlobalContext } from "../../context";
 
-import notificationSound from "../../AUDIO/chord.wav";
-
 import Rooms from "../../COMPONENTS/GLOBALS/Rooms";
 import SearchBar from "../../COMPONENTS/GLOBALS/SearchBar";
 import ChatPane from "../../COMPONENTS/GLOBALS/ChatPane";
@@ -16,7 +14,7 @@ import JoinGroup from "./JoinGroup";
 import AllRoomsActions from "../../COMPONENTS/GLOBALS/AllRoomsActions";
 
 export default function AllRooms() {
-  const { url, socket } = useGlobalContext();
+  const { url, socket, notification } = useGlobalContext();
   const [allRooms, setAllRooms] = React.useState([]);
   const [currPath, setCurrPath] = React.useState("ar");
   const [err, setErr] = React.useState({ msg: "", active: false });
@@ -30,7 +28,6 @@ export default function AllRooms() {
     roomFrom: undefined,
   });
 
-  const notification = React.useMemo(() => new Audio(notificationSound), []);
   const token = localStorage.getItem("token");
   const path = window.location.pathname.split("/");
 
