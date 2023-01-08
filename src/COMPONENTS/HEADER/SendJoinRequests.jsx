@@ -1,8 +1,10 @@
-import axios from "axios";
 import React from "react";
+
+import axios from "axios";
+import Button from "../INPUT/Button";
+
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { useGlobalContext } from "../../context";
-import Button from "../INPUT/Button";
 
 export default function SendJoinRequests(props) {
   const [users, setUsers] = React.useState([]);

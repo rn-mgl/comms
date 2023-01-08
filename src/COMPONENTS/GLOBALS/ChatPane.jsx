@@ -41,11 +41,11 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
   const paneRef = React.useRef();
   const bottomRef = React.useRef();
 
-  props.notification.volume = 1;
   const { room_code } = useParams();
   const token = localStorage.getItem("token");
   const user = parseInt(localStorage.getItem("user"));
   const navigate = useNavigate();
+
   const messagePath = props.selectedRoom?.roomType === "direct" ? "dm" : "gm";
   const roomPath = props.selectedRoom?.roomType === "direct" ? "dr" : "gr";
   const willReply =
