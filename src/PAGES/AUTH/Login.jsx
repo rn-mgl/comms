@@ -14,6 +14,8 @@ import ErrMsg from "../../COMPONENTS/GLOBALS/ErrMsg";
 export default function Login() {
   const { url, socket } = useGlobalContext();
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+  const user = localStorage.getItem("user");
 
   const [login, setLogin] = React.useState({
     email: "",
@@ -63,6 +65,12 @@ export default function Login() {
       setErr({ msg: error, active: true });
     }
   };
+
+  React.useEffect(() => {
+    if (token && token.startsWith("Bearer ") && user && user.toLowerCase() === user.toUpperCase()) {
+      navigate("/comms/ar");
+    }
+  }, [navigate, token, user]);
 
   return (
     <div

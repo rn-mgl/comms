@@ -3,19 +3,8 @@ import React from "react";
 import landing from "../../IMG/comms landing.png";
 import LinkButton from "../../COMPONENTS/INPUT/LinkButton";
 import LogoImg from "../../COMPONENTS/GLOBALS/LogoImg";
-import { useNavigate } from "react-router-dom";
 
 export default function Landing() {
-  const token = localStorage.getItem("token");
-  const user = localStorage.getItem("user");
-  const navigate = useNavigate("");
-
-  React.useEffect(() => {
-    if (token && token.startsWith("Bearer ") && user && user.toLowerCase() === user.toUpperCase()) {
-      navigate("/comms/ar");
-    }
-  }, [navigate, token, user]);
-
   return (
     <div className="cstm-flex ">
       <LogoImg />
