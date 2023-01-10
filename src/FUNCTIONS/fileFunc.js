@@ -13,8 +13,9 @@ export const filePreview = (file, setSelectedFile) => {
 
 export const uploadFile = async (file, url, setSelectedFile) => {
   if (!file) {
-    return "Error: Enter file before uploading.";
+    return;
   }
+
   if (file.size > 10000000) {
     return "Error: Select files under 10MB.";
   }
@@ -32,4 +33,10 @@ export const uploadFile = async (file, url, setSelectedFile) => {
     console.log(error);
     return fileLink;
   }
+};
+
+export const isLink = (link) => {
+  const res = link.startsWith("https://res.cloudinary.com/dnzuptxvy");
+
+  return res;
 };

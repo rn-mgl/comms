@@ -5,6 +5,7 @@ import { AiOutlineArrowLeft } from "react-icons/ai";
 
 import Input from "../INPUT/Input";
 import IconInput from "../INPUT/IconInput";
+import Button from "../INPUT/Button";
 import Submit from "../INPUT/Submit";
 import SelectedFile from "../CHAT PANE/SelectedFile";
 import FileViewer from "../CHAT BAR/FileViewer";
@@ -73,16 +74,19 @@ export default function UpdateUserData(props) {
         (new_password !== undefined && textFns.isBlank(new_password)) ||
         (old_password !== undefined && textFns.isBlank(old_password)))
     ) {
+      setErr({ msg: "Name and Surname could not be blank", active: true });
       return;
     } else if (updateName && textFns.isEmpty(name)) {
+      setErr({ msg: "Name could not be blank", active: true });
       return;
     } else if (updateSurame && textFns.isEmpty(surname)) {
+      setErr({ msg: "Surname could not be blank", active: true });
       return;
     } else if (updateICN && textFns.isEmpty(in_comms_name)) {
+      setErr({ msg: "in_comms_name alone could not be blank", active: true });
       return;
     } else if (updatePassword && (textFns.isBlank(old_password) || textFns.isBlank(new_password))) {
-      return;
-    } else if (updateProfile && (!image || textFns.isBlank(image))) {
+      setErr({ msg: "Password fields could not be blank", active: true });
       return;
     }
 
@@ -129,11 +133,17 @@ export default function UpdateUserData(props) {
     });
   };
 
-  const unselectFile = () => {
+  const removeFile = () => {
     setSelectedFile({
       fileName: undefined,
       fileType: undefined,
       fileUrl: undefined,
+    });
+    setUserData((prev) => {
+      return {
+        ...prev,
+        image: undefined,
+      };
     });
   };
 
@@ -241,7 +251,7 @@ export default function UpdateUserData(props) {
               Update Profile Picture
             </div>
             {selectedFile.fileUrl ? (
-              <SelectedFile unselectFile={unselectFile} selectedFile={selectedFile} css="mx-auto" />
+              <SelectedFile removeFile={removeFile} selectedFile={selectedFile} css="mx-auto" />
             ) : userData.image && !userData.image.includes("fakepath") ? (
               <div className="cstm-flex flex-col gap-2">
                 <FileViewer file={userData.image} />
@@ -266,6 +276,9 @@ export default function UpdateUserData(props) {
           </>
         )}
 
+        {(selectedFile.fileUrl || userData.image) && (
+          <Button label="Remove File" css="bg-gr2 text-wht" onClick={removeFile} />
+        )}
         <Submit label="Update" css="bg-blk text-wht" />
       </form>
     </div>

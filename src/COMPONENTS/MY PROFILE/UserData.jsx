@@ -78,7 +78,11 @@ export default function UserData() {
           t:w-full
                       t:text-center"
         >
-          <div className="font-bold">{`${userData?.name} ${userData?.surname}`}</div>
+          <div className="font-bold">
+            {`${userData?.name} ${userData?.surname} ${
+              userData?.in_comms_name ? `| ${userData?.in_comms_name}` : null
+            }`}
+          </div>
           <div className="font-light text-sm">{userData?.email}</div>
         </div>
         <AiOutlineEdit

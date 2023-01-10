@@ -204,7 +204,20 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
     });
   }, [socket, fetchMessages, fetchRoomData, user, navigate]);
 
-  const unselectFile = () => {
+  const socketReflectUpdateRoom = React.useCallback(() => {
+    socket.on("reflect-update-room", () => {
+      fetchRoomData();
+    });
+  }, [socket, fetchRoomData]);
+
+  const removeFile = () => {
+    setMessageData((prev) => {
+      return {
+        ...prev,
+        message_file: undefined,
+      };
+    });
+
     setSelectedFile({
       fileUrl: undefined,
       fileType: undefined,
@@ -217,12 +230,12 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
     scrollIntoView();
   };
 
-  const scrollIntoView = () => {
-    bottomRef?.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
   const selectMessage = (id) => {
     setSelectedMessage((prev) => (prev === id ? -1 : id));
+  };
+
+  const scrollIntoView = () => {
+    bottomRef?.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const handleMessageData = ({ name, value }) => {
@@ -281,6 +294,10 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
     socketReflectRemove();
   }, [socketReflectRemove]);
 
+  React.useEffect(() => {
+    socketReflectUpdateRoom();
+  }, [socketReflectUpdateRoom]);
+
   return (
     props.selectedRoom?.roomId !== -1 && (
       <div
@@ -298,6 +315,7 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
             path={props.path}
             roomPath={roomPath}
             fetchAllRooms={fetchAllRooms}
+            fetchRoomData={fetchRoomData}
           />
         </div>
 
@@ -314,15 +332,19 @@ export default function ChatPane({ fetchAllRooms, ...props }) {
                       t:top-44"
             />
           )}
+
           {willReply && (
             <ReplyMode messageData={messageData} handleReplyTo={() => handleReplyTo(-1, "")} />
           )}
+
           <div ref={bottomRef} className="float-left clear-both" />
 
           {selectedFile.fileUrl && (
-            <SelectedFile unselectFile={unselectFile} selectedFile={selectedFile} />
+            <SelectedFile removeFile={removeFile} selectedFile={selectedFile} />
           )}
+
           {sending && <SendingMsg messageData={messageData} />}
+
           <ChatBar
             messages={messages}
             messagePath={messagePath}

@@ -106,6 +106,12 @@ export default function AllRooms() {
     });
   }, [fetchAllRooms, socket]);
 
+  const sockerReflectUpdateRoom = React.useCallback(() => {
+    socket.on("reflect-update-room", () => {
+      fetchAllRooms();
+    });
+  }, [socket, fetchAllRooms]);
+
   const handleActiveBarOptions = (id) => {
     setActiveBarOptions((prev) => (prev === id ? "" : id));
   };
@@ -161,6 +167,10 @@ export default function AllRooms() {
   React.useEffect(() => {
     socketRelfectRemove();
   }, [socketRelfectRemove]);
+
+  React.useEffect(() => {
+    sockerReflectUpdateRoom();
+  }, [sockerReflectUpdateRoom]);
 
   React.useEffect(() => {
     if (localStorage.getItem("roomId")) {

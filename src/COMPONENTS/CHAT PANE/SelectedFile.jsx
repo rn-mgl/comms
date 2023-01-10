@@ -6,6 +6,7 @@ import { AiOutlineCloseCircle } from "react-icons/ai";
 
 export default function SelectedFile(props) {
   const type = props.selectedFile.fileType;
+
   return (
     <div
       className={`${type === "audio" ? "w-full t:w-72" : "w-36"} ${
@@ -13,7 +14,7 @@ export default function SelectedFile(props) {
       } shadow-md mr-auto rounded-md border-4 border-wht bg-wht text-center text-xs font-light font-head opacity-90`}
     >
       <AiOutlineCloseCircle
-        onClick={props.unselectFile}
+        onClick={props.removeFile}
         className="ml-auto m-2 scale-110 cursor-pointer"
       />
       {type === "image" ? (

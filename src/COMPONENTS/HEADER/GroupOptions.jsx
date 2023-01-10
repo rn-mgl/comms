@@ -3,7 +3,7 @@ import React from "react";
 export default function GroupOptions(props) {
   return (
     <div
-      className="cstm-flex flex-col text-center gap-1 absolute top-0 translate-x-11 translate-y-12 p-2 
+      className="cstm-flex flex-col text-center gap-1 absolute top-0 z-10 translate-x-11 translate-y-12 p-2 
                  rounded-md bg-gr2 shadow-md text-wht font-head text-sm
                  m-m:translate-x-3
                  m-l:-translate-x-3
@@ -34,6 +34,13 @@ export default function GroupOptions(props) {
           </div>
         </>
       ) : null}
+
+      <>
+        <div className="cstm-divider my-0 bg-wht w-full" />
+        <div className="cstm-chat-options cursor-pointer" onClick={props.handleCanUpdateGroup}>
+          Manage Group
+        </div>
+      </>
     </div>
   );
 }

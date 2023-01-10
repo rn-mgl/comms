@@ -12,6 +12,7 @@ import AddMember from "../HEADER/AddMember";
 import DeleteGroup from "../HEADER/DeleteGroup";
 import SendJoinRequests from "../HEADER/SendJoinRequests";
 import Members from "../HEADER/Members";
+import UpdateGroup from "../HEADER/UpdateGroup";
 
 export default function Header(props) {
   const { url } = useGlobalContext();
@@ -21,6 +22,7 @@ export default function Header(props) {
   const [canSendJoinRequest, setCanSendJoinRequest] = React.useState(false);
   const [canDeleteGroup, setCanDeleteGroup] = React.useState(false);
   const [canSeeMembers, setCanSeeMembers] = React.useState(false);
+  const [canUpdateGroup, setCanUpdateGroup] = React.useState(false);
   const [err, setErr] = React.useState({ msg: "", active: false });
 
   const token = localStorage.getItem("token");
@@ -60,6 +62,10 @@ export default function Header(props) {
     setCanSeeMembers((prev) => !prev);
   };
 
+  const handleCanUpdateGroup = () => {
+    setCanUpdateGroup((prev) => !prev);
+  };
+
   const clearLocalStorageRoom = () => {
     localStorage.removeItem("roomId");
     localStorage.removeItem("roomType");
@@ -77,6 +83,7 @@ export default function Header(props) {
           handleCanDeleteGroup={handleCanDeleteGroup}
           handleCanSendJoinRequests={handleCanSendJoinRequests}
           handleCanSeeMembers={handleCanSeeMembers}
+          handleCanUpdateGroup={handleCanUpdateGroup}
         />
       )}
 
@@ -101,6 +108,14 @@ export default function Header(props) {
 
       {canSeeMembers && (
         <Members roomData={props.roomData} handleCanSeeMembers={handleCanSeeMembers} />
+      )}
+
+      {canUpdateGroup && (
+        <UpdateGroup
+          fetchRoomData={props.fetchRoomData}
+          roomData={props.roomData}
+          handleCanUpdateGroup={handleCanUpdateGroup}
+        />
       )}
 
       <div className="cstm-flex">
