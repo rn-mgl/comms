@@ -5,7 +5,7 @@ import chord from "./AUDIO/chord.wav";
 const AppContext = React.createContext();
 
 const AppProvider = ({ children }) => {
-  const url = `http://192.168.1.121:9000`;
+  const url = `https://comms-server.onrender.com`;
   const socket = io(url);
   const notification = new Audio(chord);
   notification.volume = 0.7;
